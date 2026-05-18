@@ -1,0 +1,16 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// ตารางสำหรับเก็บข้อมูลงาน (Task)
+model Task {
+  id        Int      @id @default(autoincrement())
+  title     String
+  status    String   @default("ทำอยู่")
+  createdAt DateTime @default(now())
+}

@@ -32,3 +32,38 @@ export async function POST(request) {
     return NextResponse.json({ error: 'บันทึกลง Database ล้มเหลว' }, { status: 500 });
   }
 }
+
+// 3. PATCH Method: รองรับการแก้ไขทั้งชื่องาน (title) และสถานะ (status)
+export async function PATCH(request) {
+  try {
+    const body = await request.json();
+    const { id, title, status } = body;
+
+    const updatedTask = await prisma.task.update({
+      where: { id: Number(id) },
+      data: {
+        ...(title && { title }),   // ถ้าส่ง title มาให้แก้ title
+        ...(status && { status })  // ถ้าส่ง status มาให้แก้ status
+      }
+    });
+
+    return NextResponse.json(updatedTask);
+  } catch (error) {
+    return NextResponse.json({ error: 'แก้ไขข้อมูลล้มเหลว' }, { status: 500 });
+  }
+}
+
+// 4. DELETE Method: สำหรับรับรหัสงาน (id) มาลบออกจากฐานข้อมูลจริง
+export async function DELETE(request) {
+  try {
+    const body = await request.json(); // รับ id ของงานที่ต้องการลบ
+    const { id } = body;
+    // ใช้ Prisma สั่งลบข้อมูลในตาราง Task แบบถาวร
+    await prisma.task.delete({
+      where: { id: Number(id) } // ค้นหางานด้วย id แล้วลบออกจากฐานข้อมูล
+    });
+    return NextResponse.json({ message: 'ลบงานสำเร็จ' });
+  } catch (error) {
+    return NextResponse.json({ error: 'ลบงานจาก Database ล้มเหลว' }, { status: 500 });
+  }
+}
